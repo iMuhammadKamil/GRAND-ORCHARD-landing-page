@@ -5,11 +5,10 @@ import { motion } from "framer-motion";
 import { Loader2, CheckCircle2, Phone } from "lucide-react";
 import { SectionHeader } from "./section-header";
 import { Reveal } from "./reveal";
+import { CONTACT } from "@/lib/grand-orchard";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 
 type Status = "idle" | "submitting" | "success" | "error";
-
-const INTERESTS = ["Apartment", "Commercial", "Kiosk", "General Enquiry"] as const;
 
 const inputCls =
   "w-full border border-paper/25 bg-transparent px-4 py-3.5 text-[0.9375rem] text-paper placeholder:text-paper/40 transition-colors duration-300 focus:border-beige focus:outline-none rounded-none";
@@ -28,12 +27,15 @@ export function EnquiryForm() {
 
     const form = e.currentTarget;
     const fd = new FormData(form);
+    // Lead/enquiry structure matching the official Premier Choice Grand
+    // Orchard enquiry section: name, email, phone + submit (call back).
+    // API fields not part of this form are sent as neutral defaults.
     const payload = {
       name: String(fd.get("name") ?? ""),
-      phone: String(fd.get("phone") ?? ""),
       email: String(fd.get("email") ?? ""),
-      interest: String(fd.get("interest") ?? ""),
-      message: String(fd.get("message") ?? ""),
+      phone: String(fd.get("phone") ?? ""),
+      interest: "General Enquiry",
+      message: "",
     };
 
     setStatus("submitting");
@@ -75,7 +77,7 @@ export function EnquiryForm() {
             />
             <Reveal delay={0.15}>
               <p className="mt-8 max-w-md text-[0.9375rem] leading-relaxed text-paper/60">
-                Share your details and our team will reach out with the latest
+                Share your details and our team will call you back with the latest
                 availability, pricing and payment plan information for Grand Orchard.
               </p>
             </Reveal>
@@ -86,9 +88,17 @@ export function EnquiryForm() {
                   Call Our Team
                 </p>
                 <p className="mt-3 text-[0.9375rem] leading-relaxed text-paper/75">
-                  Prefer to speak directly? Call our team during business hours —
-                  official Grand Orchard contact numbers are shared by Premier Choice
-                  International. Contact our team for details.
+                  Prefer to speak directly? Call our team during business hours, or
+                  request a call back using the form.
+                </p>
+                <a
+                  href={CONTACT.phoneHref}
+                  className="font-display mt-4 inline-flex items-baseline gap-3 text-2xl text-paper transition-colors hover:text-beige sm:text-3xl"
+                >
+                  {CONTACT.phoneDisplay}
+                </a>
+                <p className="label-caps mt-2 text-paper/40">
+                  Premier Choice International
                 </p>
               </div>
             </Reveal>
@@ -144,28 +154,6 @@ export function EnquiryForm() {
                     </div>
 
                     <div>
-                      <label htmlFor="phone" className={labelCls}>
-                        Phone Number <span aria-hidden="true" className="text-beige">*</span>
-                      </label>
-                      <input
-                        id="phone"
-                        name="phone"
-                        type="tel"
-                        required
-                        autoComplete="tel"
-                        placeholder="+92 3XX XXXXXXX"
-                        aria-invalid={!!errors.phone}
-                        aria-describedby={errors.phone ? "phone-error" : undefined}
-                        className={inputCls}
-                      />
-                      {errors.phone && (
-                        <p id="phone-error" role="alert" className="mt-2 text-xs text-beige">
-                          {errors.phone}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="sm:col-span-2">
                       <label htmlFor="email" className={labelCls}>
                         Email Address <span aria-hidden="true" className="text-beige">*</span>
                       </label>
@@ -188,29 +176,25 @@ export function EnquiryForm() {
                     </div>
 
                     <div className="sm:col-span-2">
-                      <label htmlFor="interest" className={labelCls}>
-                        Interested In
+                      <label htmlFor="phone" className={labelCls}>
+                        Phone Number <span aria-hidden="true" className="text-beige">*</span>
                       </label>
-                      <select id="interest" name="interest" defaultValue="Apartment" className={inputCls}>
-                        {INTERESTS.map((o) => (
-                          <option key={o} value={o} className="bg-ink text-paper">
-                            {o}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="sm:col-span-2">
-                      <label htmlFor="message" className={labelCls}>
-                        Message
-                      </label>
-                      <textarea
-                        id="message"
-                        name="message"
-                        rows={4}
-                        placeholder="Tell us what you're looking for (optional)"
-                        className={`${inputCls} resize-none`}
+                      <input
+                        id="phone"
+                        name="phone"
+                        type="tel"
+                        required
+                        autoComplete="tel"
+                        placeholder="+92 3XX XXXXXXX"
+                        aria-invalid={!!errors.phone}
+                        aria-describedby={errors.phone ? "phone-error" : undefined}
+                        className={inputCls}
                       />
+                      {errors.phone && (
+                        <p id="phone-error" role="alert" className="mt-2 text-xs text-beige">
+                          {errors.phone}
+                        </p>
+                      )}
                     </div>
                   </div>
 
@@ -231,7 +215,7 @@ export function EnquiryForm() {
                         Sending…
                       </>
                     ) : (
-                      "Send Enquiry"
+                      "Request a Call Back"
                     )}
                   </button>
                 </form>

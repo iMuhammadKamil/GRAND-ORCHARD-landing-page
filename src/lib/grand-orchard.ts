@@ -21,6 +21,19 @@ export const PROJECT = {
   boulevard: "Orchard Boulevard, DHA, Islamabad",
 } as const;
 
+/**
+ * Official Premier Choice International contact channel for Grand Orchard,
+ * as provided by the project owner. The WhatsApp deep link is built once at
+ * module scope (deterministic — identical on server and client).
+ */
+export const CONTACT = {
+  phoneDisplay: "+92 301 123 3333",
+  phoneHref: "tel:+923011233333",
+  whatsappUrl: `https://wa.me/923011233333?text=${encodeURIComponent(
+    "Hello, I would like more information about Grand Orchard."
+  )}`,
+} as const;
+
 export const HERO_STATS = [
   { value: "1,000,000", unit: "SQ.FT", label: "Project Area" },
   { value: "4", unit: "", label: "Commercial Floors" },
@@ -45,6 +58,12 @@ export type Amenity = {
   title: string;
   description: string;
   icon: string;
+  /**
+   * Existing on-site visual for this amenity. Only set where a matching
+   * asset exists; these renders are explicitly labelled "Indicative Visual"
+   * wherever they appear, so nothing is presented as an official photograph.
+   */
+  image?: string;
 };
 
 export const AMENITIES: Amenity[] = [
@@ -92,6 +111,7 @@ export const AMENITIES: Amenity[] = [
     title: "Swimming Pool",
     description: "Swimming pool within the project.",
     icon: "pool",
+    image: "/images/fac-1.png",
   },
   {
     title: "Ecological Approach",
@@ -112,6 +132,7 @@ export const AMENITIES: Amenity[] = [
     title: "Fitness Center",
     description: "Fitness center for residents.",
     icon: "fitness",
+    image: "/images/fac-2.png",
   },
 ];
 
@@ -207,24 +228,50 @@ export const NAV_LINKS = [
 
 /**
  * FAQ — every answer restates only officially published Grand Orchard
- * information. Where a fact is not published, the answer directs to the team.
+ * information (Premier Choice International project page and its official
+ * Grand Orchard FAQ). Where a fact is not published, the answer directs to
+ * the team. Nothing generic or third-party is quoted.
  */
 export const FAQS = [
   {
+    q: "What is the status of Grand Orchard?",
+    a: "Grand Orchard is officially listed as Under Construction. For the latest construction progress, contact our team for details.",
+  },
+  {
     q: "Where is Grand Orchard located?",
-    a: "Grand Orchard is located at Orchard Boulevard, DHA Orchard, DHA Phase I, Islamabad — with its address at Main Link Road, Phase Sector B, DHA, Islamabad. It is approximately a one-minute drive from GT Road and Fauji Foundation.",
+    a: "Grand Orchard is located at DHA Orchard, DHA Phase I, Islamabad — with its address at Main Link Road, Phase Sector B, DHA, Islamabad. It is approximately a one-minute drive from GT Road and Fauji Foundation, at the newest commercial hub of the Twin Cities.",
   },
   {
-    q: "What is the current status of the project?",
-    a: "Grand Orchard is under construction. For the latest construction progress, contact our team for details.",
+    q: "What is the total project area?",
+    a: "The total project area is 1,000,000 SQ.FT.",
   },
   {
-    q: "What does the project comprise?",
-    a: "Grand Orchard is a commercial and residential development of 1,000,000 sq.ft, with 4 commercial floors and a structure of 4 basement parking floors plus Ground + 18 floors.",
+    q: "What type of project is Grand Orchard?",
+    a: "Grand Orchard is a Commercial & Residential development.",
   },
   {
-    q: "What unit sizes are available?",
-    a: "Apartments range from 516.23 sq.ft to 4,191.9 sq.ft, and commercial units range from 88 sq.ft to 517 sq.ft. Availability changes over time — contact our team for current availability.",
+    q: "What is the structure of Grand Orchard?",
+    a: "The structure comprises 4 Basement Parking Floors + G + 18 Floors.",
+  },
+  {
+    q: "How many commercial floors are there?",
+    a: "Grand Orchard includes 4 Commercial Floors.",
+  },
+  {
+    q: "What are the apartment sizes?",
+    a: "Apartments range from 516.23 sq.ft to 4,191.9 sq.ft, as officially listed for Grand Orchard. Availability changes over time — contact our team for current availability.",
+  },
+  {
+    q: "What are the commercial unit sizes?",
+    a: "Commercial units range from 88 sq.ft to 517 sq.ft. Availability changes over time — contact our team for current availability.",
+  },
+  {
+    q: "What views do the apartments offer?",
+    a: "Hill view, Valley view, River view, and Pool view are officially listed for Grand Orchard.",
+  },
+  {
+    q: "What amenities are available?",
+    a: "The officially announced amenities are: Mall, 4 Layered Security, Foodcourt, Card-based Community, Supermarket, Tennis Court, Grade AAA Parkings, On-Demand Cleaning Services, Swimming Pool, Ecological Approach, Restaurants and Cafes, Gated Community, and Fitness Center.",
   },
   {
     q: "What are the rates?",
@@ -233,10 +280,6 @@ export const FAQS = [
   {
     q: "Is there a payment plan?",
     a: "We do not publish payment terms online. Contact our team for the latest payment plan, availability, and booking information.",
-  },
-  {
-    q: "What views do the apartments offer?",
-    a: "The project officially lists Hill, Valley, River, and Pool views.",
   },
   {
     q: "Is a hotel part of Grand Orchard?",

@@ -1,7 +1,8 @@
-import { MapPin, ArrowUpRight, ExternalLink } from "lucide-react";
+import { ArrowUpRight, ExternalLink } from "lucide-react";
 import { MAP, PROJECT } from "@/lib/grand-orchard";
 import { SectionHeader } from "./section-header";
 import { Reveal, ImageReveal } from "./reveal";
+import { MapPanel } from "./map-panel";
 
 export function Location() {
   return (
@@ -45,29 +46,7 @@ export function Location() {
             <div className="lg:col-span-6">
               <div className="flex h-full flex-col">
                 <ImageReveal className="flex-1">
-                  <div className="relative h-full min-h-[320px] overflow-hidden border border-line bg-cream sm:min-h-[420px]">
-                    <iframe
-                      title="OpenStreetMap — DHA Phase I, Islamabad, near Grand Orchard"
-                      src={MAP.embedUrl}
-                      className="absolute inset-0 h-full w-full grayscale-[35%] contrast-[1.02]"
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                    />
-                    {/* Address plate */}
-                    <div className="pointer-events-none absolute bottom-4 left-4 right-4 sm:right-auto sm:max-w-xs">
-                      <div className="pointer-events-auto border border-line bg-paper/95 p-4 backdrop-blur-sm sm:p-5">
-                        <p className="label-caps flex items-center gap-2 text-wine">
-                          <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
-                          Find Grand Orchard
-                        </p>
-                        <p className="mt-2 text-sm font-medium leading-snug text-ink">
-                          Grand Orchard — DHA Phase I
-                          <br />
-                          Islamabad, Pakistan
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                  <MapPanel />
                 </ImageReveal>
                 <Reveal delay={0.2}>
                   <a

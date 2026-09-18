@@ -6,7 +6,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import { X, ChevronLeft, ChevronRight, Expand } from "lucide-react";
 import { SectionHeader } from "./section-header";
 import { Reveal, ImageReveal, ScaleIn } from "./reveal";
-import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
+import {
+  useArmedAfterHydration,
+  usePrefersReducedMotion,
+} from "@/hooks/use-prefers-reduced-motion";
 import { cn } from "@/lib/utils";
 
 type Category =
@@ -92,6 +95,7 @@ export function Gallery() {
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("All");
   const [lightbox, setLightbox] = useState<number | null>(null);
   const reduce = usePrefersReducedMotion();
+  const armed = useArmedAfterHydration();
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const lastFocused = useRef<HTMLElement | null>(null);
 
@@ -202,10 +206,24 @@ export function Gallery() {
                 item.featured ? "sm:col-span-2 sm:row-span-2" : "",
                 reduce ? "" : "motion-safe:transition-colors"
               )}
-              initial={reduce ? false : { opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={false}
+              animate={
+                reduce
+                  ? { opacity: 1, y: 0 }
+                  : armed
+                    ? { opacity: 0, y: 24, transition: { duration: 0 } }
+                    : { opacity: 1, y: 0 }
+              }
+              whileInView={{
+                opacity: 1,
+                y: 0,
+                transition: {
+                  duration: 0.8,
+                  delay: 0.05 * (idx % 4),
+                  ease: [0.16, 1, 0.3, 1],
+                },
+              }}
               viewport={{ once: true, margin: "-8% 0px" }}
-              transition={{ duration: 0.8, delay: 0.05 * (idx % 4), ease: [0.16, 1, 0.3, 1] }}
             >
               <div
                 className={cn(

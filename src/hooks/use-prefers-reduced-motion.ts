@@ -55,3 +55,25 @@ export function usePrefersReducedMotion(): boolean {
 
   return reduce;
 }
+
+/**
+ * Progressive-enhancement gate for entrance animations.
+ *
+ * Returns `false` during SSR and the first (hydration) render — so server
+ * HTML and first client HTML are identical and carry NO hidden state (no
+ * opacity:0 baked in) — then flips to `true` in a layout effect immediately
+ * after hydration, before the browser paints.
+ *
+ * Motion components branch on this value: while `false` the content renders
+ * fully visible (the page is complete even if JavaScript never runs), and
+ * once `true` the hidden start state is applied and whileInView plays the
+ * exact same entrance animations as before. Visitors whose JS fails or is
+ * disabled simply see the finished page instead of blank sections.
+ */
+export function useArmedAfterHydration(): boolean {
+  const [armed, setArmed] = useState(false);
+
+  useIsomorphicLayoutEffect(() => setArmed(true), []);
+
+  return armed;
+}

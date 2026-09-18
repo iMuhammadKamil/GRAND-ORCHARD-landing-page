@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       ok: true,
-      message: "Thank you. Our team will contact you regarding Grand Orchard.",
+      message: "Thank you. Our team will call you back regarding Grand Orchard.",
     });
   } catch (err) {
     console.error("[api/enquiry] failed:", err);

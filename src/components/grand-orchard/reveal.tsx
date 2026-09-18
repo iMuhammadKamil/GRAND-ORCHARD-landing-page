@@ -2,9 +2,24 @@
 
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
-import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
+import {
+  useArmedAfterHydration,
+  usePrefersReducedMotion,
+} from "@/hooks/use-prefers-reduced-motion";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
+
+/**
+ * Scroll-reveal primitives.
+ *
+ * Progressive enhancement: server HTML (and the first client render) is fully
+ * visible — nothing is hidden behind JavaScript. `useArmedAfterHydration`
+ * flips true right after hydration, the hidden start state is applied
+ * instantly (duration 0), and whileInView then plays the entrance animation
+ * exactly as designed. If JavaScript never runs, visitors simply see the
+ * finished sections instead of blank areas. Reduced-motion visitors get the
+ * plain static markup, as before.
+ */
 
 /** Fade-up entrance on scroll. Respects prefers-reduced-motion. */
 export function Reveal({
@@ -23,6 +38,7 @@ export function Reveal({
   once?: boolean;
 }) {
   const reduce = usePrefersReducedMotion();
+  const armed = useArmedAfterHydration();
 
   if (reduce) {
     const Tag = motion[as];
@@ -33,10 +49,18 @@ export function Reveal({
   return (
     <Tag
       className={className}
-      initial={{ opacity: 0, y }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={false}
+      animate={
+        armed
+          ? { opacity: 0, y, transition: { duration: 0 } }
+          : { opacity: 1, y: 0 }
+      }
+      whileInView={{
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.9, delay, ease: EASE },
+      }}
       viewport={{ once, margin: "-12% 0px" }}
-      transition={{ duration: 0.9, delay, ease: EASE }}
     >
       {children}
     </Tag>
@@ -54,6 +78,7 @@ export function ImageReveal({
   className?: string;
 }) {
   const reduce = usePrefersReducedMotion();
+  const armed = useArmedAfterHydration();
 
   if (reduce) {
     return <div className={className}>{children}</div>;
@@ -62,10 +87,22 @@ export function ImageReveal({
   return (
     <motion.div
       className={className}
-      initial={{ clipPath: "inset(8% 4% 8% 4%)", opacity: 0.4 }}
-      whileInView={{ clipPath: "inset(0% 0% 0% 0%)", opacity: 1 }}
+      initial={false}
+      animate={
+        armed
+          ? {
+              clipPath: "inset(8% 4% 8% 4%)",
+              opacity: 0.4,
+              transition: { duration: 0 },
+            }
+          : { clipPath: "inset(0% 0% 0% 0%)", opacity: 1 }
+      }
+      whileInView={{
+        clipPath: "inset(0% 0% 0% 0%)",
+        opacity: 1,
+        transition: { duration: 1.2, delay, ease: EASE },
+      }}
       viewport={{ once: true, margin: "-10% 0px" }}
-      transition={{ duration: 1.2, delay, ease: EASE }}
     >
       {children}
     </motion.div>
@@ -83,6 +120,7 @@ export function ScaleIn({
   className?: string;
 }) {
   const reduce = usePrefersReducedMotion();
+  const armed = useArmedAfterHydration();
 
   if (reduce) {
     return <div className={className}>{children}</div>;
@@ -91,10 +129,17 @@ export function ScaleIn({
   return (
     <motion.div
       className={className}
-      initial={{ scale: 1.08 }}
-      whileInView={{ scale: 1 }}
+      initial={false}
+      animate={
+        armed
+          ? { scale: 1.08, transition: { duration: 0 } }
+          : { scale: 1 }
+      }
+      whileInView={{
+        scale: 1,
+        transition: { duration: 1.6, delay, ease: EASE },
+      }}
       viewport={{ once: true, margin: "-10% 0px" }}
-      transition={{ duration: 1.6, delay, ease: EASE }}
     >
       {children}
     </motion.div>

@@ -11,6 +11,7 @@ import { Faq } from "@/components/grand-orchard/faq";
 import { EnquiryForm } from "@/components/grand-orchard/enquiry-form";
 import { FinalCta } from "@/components/grand-orchard/final-cta";
 import { Footer } from "@/components/grand-orchard/footer";
+import { WhatsAppButton } from "@/components/grand-orchard/whatsapp-button";
 import { FAQS, FACTS, PROJECT } from "@/lib/grand-orchard";
 
 /** schema.org structured data built strictly from official facts. */
@@ -96,6 +97,7 @@ export default function Home() {
         <FinalCta />
       </main>
       <Footer year={new Date().getFullYear()} />
+      <WhatsAppButton />
     </div>
   );
 }
