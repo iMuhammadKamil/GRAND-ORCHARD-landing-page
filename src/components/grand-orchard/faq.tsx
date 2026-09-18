@@ -20,6 +20,7 @@ export function Faq() {
               number="06"
               label="FAQ"
               lines={["Questions,", "Answered Simply."]}
+              tone="dark"
             />
             <Reveal delay={0.15}>
               <p className="mt-8 max-w-md text-[0.9375rem] leading-relaxed text-ink-soft">

@@ -12,7 +12,12 @@ export function Location() {
         <div className="mx-auto max-w-[1440px] px-5 py-20 sm:px-8 sm:py-28 lg:px-12 lg:py-36">
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
             <div className="lg:col-span-6">
-              <SectionHeader number="03" label="Location" lines={["Connected to", "the Right Address."]} />
+              <SectionHeader
+                number="03"
+                label="Location"
+                lines={["Connected to", "the Right Address."]}
+                tone="dark"
+              />
 
               <Reveal delay={0.15}>
                 <address className="mt-10 not-italic">

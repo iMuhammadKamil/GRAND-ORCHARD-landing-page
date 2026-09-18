@@ -18,7 +18,7 @@ export function Pricing() {
     <section id="pricing" className="bg-paper text-ink" aria-label="Official pricing">
       <div className="mx-auto max-w-[1440px] px-5 py-20 sm:px-8 sm:py-28 lg:px-12 lg:py-36">
         <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
-          <SectionHeader number="04" label="Pricing" lines={["Official", "Pricing"]} />
+          <SectionHeader number="04" label="Pricing" lines={["Official", "Pricing"]} tone="dark" />
           <Reveal delay={0.15} className="lg:pb-3">
             <p className="label-caps inline-flex items-center gap-3 border border-line bg-cream px-4 py-2.5 text-ink/70">
               <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-wine" />

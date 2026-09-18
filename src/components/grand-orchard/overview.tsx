@@ -7,7 +7,12 @@ export function Overview() {
   return (
     <section id="overview" className="bg-paper text-ink" aria-label="Project overview">
       <div className="mx-auto max-w-[1440px] px-5 py-20 sm:px-8 sm:py-28 lg:px-12 lg:py-36">
-        <SectionHeader number="01" label="Project Overview" lines={["Grand Orchard", "at DHA Orchard"]} />
+        <SectionHeader
+          number="01"
+          label="Project Overview"
+          lines={["Grand Orchard", "at DHA Orchard"]}
+          tone="dark"
+        />
 
         <div className="mt-14 grid grid-cols-1 gap-12 lg:mt-20 lg:grid-cols-12 lg:gap-16">
           {/* Editorial image */}

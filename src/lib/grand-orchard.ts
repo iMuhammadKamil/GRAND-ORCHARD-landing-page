@@ -71,6 +71,7 @@ export const AMENITIES: Amenity[] = [
     title: "Mall",
     description: "Retail core within the development.",
     icon: "store",
+    image: "/images/ci-1.png",
   },
   {
     title: "4 Layered Security",
