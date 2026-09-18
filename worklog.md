@@ -23,3 +23,22 @@ Stage Summary:
 - DELIVERED: complete single-page premium landing at src/app/page.tsx assembling 13 components in src/components/grand-orchard/ + official data in src/lib/grand-orchard.ts
 - Integrity: only officially published Grand Orchard facts used; unknowns → "Contact our team for details."; no invented payment plans/dates/ROI/contact numbers; AI visuals explicitly labeled "Indicative Visual"
 - Real imagery: 3 cleaned official renders + construction photo + Hilton signing photo; hero uses the real project elevation
+
+---
+Task ID: 2
+Agent: main (Super Z)
+Task: Fix React/Next.js hydration mismatch errors ONLY — no design/content/layout/animation changes to the Grand Orchard landing page
+
+Work Log:
+- Root-caused via installed framer-motion 12.26.2 source: useReducedMotion() initializes useState from module-global prefersReducedMotion, populated by a synchronous window.matchMedia read on the client but null on the server → SSR rendered "animate" markup while first client render of reduced-motion users rendered "static" markup (hero go-hero-zoom/go-rise classNames, Reveal/ImageReveal/ScaleIn motion-vs-plain branching with inline opacity/transform/clip-path initial styles, gallery initial/layout props) — 9 call sites across 7 components (hero, reveal ×3, gallery, navbar, footer, final-cta, enquiry-form)
+- Created src/hooks/use-prefers-reduced-motion.ts: useState(false) stable initial value (server == first client render), isomorphic layout effect (useLayoutEffect on client → preference applied before post-hydration paint; useEffect on server → no SSR warning), matchMedia change listener keeps preference live. Accessibility behavior fully preserved; no suppressHydrationWarning, SSR intact, all animations intact
+- Swapped all 7 components to the hydration-safe hook; JSX/logic untouched — visual output identical
+- footer.tsx: removed new Date().getFullYear() from client render (nondeterministic render value, classic mismatch source); year now passed as prop from server page.tsx → identical serialized value on both sides; displayed "© 2026" unchanged
+- layout.tsx: removed pre-existing suppressHydrationWarning on <html> (was masking, not fixing; nothing mutates <html>)
+- Verified: eslint clean; tsc --noEmit clean for src/ (4 pre-existing errors only in sandbox scaffold examples/, outside build graph); isolated production build (project copy + hardlinked node_modules, .prod-check) → next build succeeded, 5/5 static pages, / prerendered; copy removed after
+- Browser E2E (scripts/verify-hydration.mjs, Playwright): 4 contexts (desktop/mobile × normal/reduced motion) → ZERO hydration warnings, zero page errors in all; normal motion: go-hero-zoom+go-rise present, marquee running, hero zoom completes; reduced motion: classes removed post-hydration, animationName none, content opacity 1 (accessibility preserved); no horizontal overflow 1440/375; gallery filter+lightbox+Esc, enquiry form submit→DB, mobile menu all pass; screenshots verify-hydration-*.png visually identical to prior design; dev.log clean
+
+Stage Summary:
+- HYDRATION FIXED at the root: server HTML and first client HTML are now identical in every context; zero suppressHydrationWarning; zero SSR disabling
+- Design, content, animations, reduced-motion behavior: unchanged (verified visually + programmatically)
+- Files touched: +src/hooks/use-prefers-reduced-motion.ts; hero.tsx, reveal.tsx, gallery.tsx, navbar.tsx, footer.tsx, final-cta.tsx, enquiry-form.tsx (hook swap), page.tsx (year prop), layout.tsx (removed suppressHydrationWarning)

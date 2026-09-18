@@ -95,7 +95,7 @@ export default function Home() {
         <EnquiryForm />
         <FinalCta />
       </main>
-      <Footer />
+      <Footer year={new Date().getFullYear()} />
     </div>
   );
 }

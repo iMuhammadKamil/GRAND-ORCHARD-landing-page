@@ -2,10 +2,10 @@
 
 import { ArrowUpRight } from "lucide-react";
 import { Reveal } from "./reveal";
-import { useReducedMotion } from "framer-motion";
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 
 export function FinalCta() {
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
   const scrollTo = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
     const el = document.querySelector(href);

@@ -74,7 +74,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body
         className={`${inter.variable} ${cormorant.variable} font-sans antialiased bg-background text-foreground`}
       >

@@ -1,11 +1,10 @@
 "use client";
 
 import { NAV_LINKS, PROJECT } from "@/lib/grand-orchard";
-import { useReducedMotion } from "framer-motion";
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 
-export function Footer() {
-  const reduce = useReducedMotion();
-  const year = new Date().getFullYear();
+export function Footer({ year }: { year: number }) {
+  const reduce = usePrefersReducedMotion();
 
   const handleNav = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();

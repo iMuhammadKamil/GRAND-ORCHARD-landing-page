@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useReducedMotion } from "framer-motion";
 import { motion } from "framer-motion";
 import { Loader2, CheckCircle2, Phone } from "lucide-react";
 import { SectionHeader } from "./section-header";
 import { Reveal } from "./reveal";
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
@@ -20,7 +20,7 @@ export function EnquiryForm() {
   const [status, setStatus] = useState<Status>("idle");
   const [feedback, setFeedback] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();

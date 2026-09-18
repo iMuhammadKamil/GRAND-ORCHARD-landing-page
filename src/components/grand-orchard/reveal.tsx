@@ -1,7 +1,8 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import type { ReactNode } from "react";
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -21,7 +22,7 @@ export function Reveal({
   as?: "div" | "section" | "li" | "article" | "figure";
   once?: boolean;
 }) {
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
 
   if (reduce) {
     const Tag = motion[as];
@@ -52,7 +53,7 @@ export function ImageReveal({
   delay?: number;
   className?: string;
 }) {
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
 
   if (reduce) {
     return <div className={className}>{children}</div>;
@@ -81,7 +82,7 @@ export function ScaleIn({
   delay?: number;
   className?: string;
 }) {
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
 
   if (reduce) {
     return <div className={className}>{children}</div>;

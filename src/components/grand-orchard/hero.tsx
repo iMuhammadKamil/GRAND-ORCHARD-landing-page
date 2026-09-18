@@ -3,10 +3,10 @@
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import { HERO_STATS } from "@/lib/grand-orchard";
-import { useReducedMotion } from "framer-motion";
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 
 export function Hero() {
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
 
   const scrollTo = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();

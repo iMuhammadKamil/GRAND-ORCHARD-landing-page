@@ -2,10 +2,11 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { X, ChevronLeft, ChevronRight, Expand } from "lucide-react";
 import { SectionHeader } from "./section-header";
 import { Reveal, ImageReveal, ScaleIn } from "./reveal";
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { cn } from "@/lib/utils";
 
 type Category =
@@ -90,7 +91,7 @@ const FILTERS: Array<"All" | Category> = [
 export function Gallery() {
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("All");
   const [lightbox, setLightbox] = useState<number | null>(null);
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const lastFocused = useRef<HTMLElement | null>(null);
 

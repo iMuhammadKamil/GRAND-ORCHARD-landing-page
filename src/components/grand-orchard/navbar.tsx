@@ -1,16 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X, ArrowUpRight } from "lucide-react";
 import { NAV_LINKS } from "@/lib/grand-orchard";
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState<string>("");
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
