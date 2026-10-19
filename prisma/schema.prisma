@@ -1,0 +1,283 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// -------------------------------------------------------------
+// 1. AUTH & USER ROLES
+// Roles: "SUPER_ADMIN", "WARDEN", "ACCOUNTANT", "MAINTENANCE_STAFF", "RESIDENT"
+// -------------------------------------------------------------
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  fullName     String
+  phoneNumber  String?
+  role         String   @default("RESIDENT") // SUPER_ADMIN, WARDEN, ACCOUNTANT, MAINTENANCE_STAFF, RESIDENT
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  residentProfile ResidentProfile?
+  staffProfile    StaffProfile?
+  sessions        Session[]
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// -------------------------------------------------------------
+// 2. PROPERTY HIERARCHY
+// -------------------------------------------------------------
+model Branch {
+  id        String     @id @default(cuid())
+  name      String
+  address   String
+  city      String
+  createdAt DateTime   @default(now())
+  buildings Building[]
+}
+
+model Building {
+  id       String  @id @default(cuid())
+  branchId String
+  name     String
+  gender   String  @default("COED") // MALE, FEMALE, COED
+  branch   Branch  @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  floors   Floor[]
+}
+
+model Floor {
+  id          String   @id @default(cuid())
+  buildingId  String
+  floorNumber Int
+  building    Building @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  rooms       Room[]
+}
+
+model RoomType {
+  id              String  @id @default(cuid())
+  name            String // Single AC, Double Non-AC, etc.
+  capacity        Int // 1, 2, 3, 4
+  hasAC           Boolean @default(false)
+  hasAttachedBath Boolean @default(false)
+  baseRent        Float   @default(0.0)
+  depositAmount   Float   @default(0.0)
+  rooms           Room[]
+}
+
+model Room {
+  id            String                @id @default(cuid())
+  floorId       String
+  roomTypeId    String
+  roomNumber    String // e.g. "101", "202"
+  floor         Floor                 @relation(fields: [floorId], references: [id], onDelete: Cascade)
+  roomType      RoomType              @relation(fields: [roomTypeId], references: [id])
+  beds          Bed[]
+  meterReadings UtilityMeterReading[]
+}
+
+model Bed {
+  id          String       @id @default(cuid())
+  roomId      String
+  bedNumber   String // e.g. "Bed-A", "Bed-B"
+  status      String       @default("VACANT") // VACANT, OCCUPIED, RESERVED, MAINTENANCE
+  room        Room         @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  allocations Allocation[]
+}
+
+// -------------------------------------------------------------
+// 3. TENANT & ALLOCATION LIFECYCLE
+// -------------------------------------------------------------
+model ResidentProfile {
+  id                String    @id @default(cuid())
+  userId            String    @unique
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dob               DateTime?
+  gender            String    @default("OTHER") // MALE, FEMALE, OTHER
+  idProofType       String    @default("STUDENT_ID") // PASSPORT, NATIONAL_ID, STUDENT_ID
+  idProofNumber     String    @default("")
+  idProofDocument   String?
+  emergencyName     String    @default("")
+  emergencyPhone    String    @default("")
+  emergencyRelation String    @default("")
+
+  allocations Allocation[]
+  tickets     MaintenanceTicket[]
+  gatePasses  GatePass[]
+  mealOptOuts MessAttendance[]
+}
+
+model StaffProfile {
+  id              String              @id @default(cuid())
+  userId          String              @unique
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  department      String              @default("MANAGEMENT") // PLUMBING, ELECTRICAL, SECURITY, MANAGEMENT, ACCOUNTS
+  assignedTickets MaintenanceTicket[]
+  approvedPasses  GatePass[]
+}
+
+model Allocation {
+  id              String    @id @default(cuid())
+  bedId           String
+  residentId      String
+  startDate       DateTime
+  endDate         DateTime?
+  securityDeposit Float     @default(0.0)
+  monthlyRent     Float     @default(0.0)
+  status          String    @default("ACTIVE") // ACTIVE, UPCOMING, COMPLETED, TERMINATED
+  checkedInAt     DateTime?
+  checkedOutAt    DateTime?
+  createdAt       DateTime  @default(now())
+
+  bed           Bed            @relation(fields: [bedId], references: [id])
+  resident      ResidentProfile @relation(fields: [residentId], references: [id])
+  invoices      Invoice[]
+  damageReports DamageReport[]
+}
+
+// -------------------------------------------------------------
+// 4. FINANCIAL ACCOUNTING & INVOICING
+// -------------------------------------------------------------
+model Invoice {
+  id            String   @id @default(cuid())
+  allocationId  String
+  invoiceNumber String   @unique // INV-2026-001
+  billingMonth  DateTime
+  dueDate       DateTime
+  subtotal      Float    @default(0.0)
+  taxOrDiscount Float    @default(0.0)
+  totalAmount   Float    @default(0.0)
+  paidAmount    Float    @default(0.0)
+  status        String   @default("ISSUED") // DRAFT, ISSUED, PARTIALLY_PAID, PAID, OVERDUE, CANCELLED
+  createdAt     DateTime @default(now())
+
+  allocation Allocation           @relation(fields: [allocationId], references: [id])
+  items      InvoiceItem[]
+  payments   PaymentTransaction[]
+}
+
+model InvoiceItem {
+  id          String  @id @default(cuid())
+  invoiceId   String
+  type        String  @default("RENT") // RENT, ELECTRICITY_SUBMETER, MESS_FEE, MESS_REBATE, DAMAGE_FEE, LATE_PENALTY
+  description String
+  amount      Float   @default(0.0)
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+model PaymentTransaction {
+  id            String   @id @default(cuid())
+  invoiceId     String
+  amount        Float    @default(0.0)
+  paymentMethod String   @default("CASH") // CASH, BANK_TRANSFER, CREDIT_CARD, UPI_OR_WALLET
+  status        String   @default("CONFIRMED") // PENDING_VERIFICATION, CONFIRMED, REJECTED
+  receiptUrl    String?
+  referenceCode String?
+  notes         String?
+  paidAt        DateTime @default(now())
+  verifiedBy    String?
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id])
+}
+
+model UtilityMeterReading {
+  id            String   @id @default(cuid())
+  roomId        String
+  utilityType   String   @default("ELECTRICITY")
+  billingPeriod DateTime
+  previousUnits Float    @default(0.0)
+  currentUnits  Float    @default(0.0)
+  unitsConsumed Float    @default(0.0)
+  ratePerUnit   Float    @default(0.0)
+  totalCost     Float    @default(0.0)
+  splitCount    Int      @default(1)
+  recordedAt    DateTime @default(now())
+
+  room Room @relation(fields: [roomId], references: [id])
+}
+
+// -------------------------------------------------------------
+// 5. MESS & CANTEEN MODULE
+// -------------------------------------------------------------
+model MessMenu {
+  id        String @id @default(cuid())
+  dayOfWeek Int // 0 = Sun, 1 = Mon ... 6 = Sat
+  mealType  String // BREAKFAST, LUNCH, DINNER, SNACKS
+  itemsList String
+}
+
+model MessAttendance {
+  id           String    @id @default(cuid())
+  residentId   String
+  date         DateTime
+  mealType     String // BREAKFAST, LUNCH, DINNER, SNACKS
+  isOptedOut   Boolean   @default(false)
+  optedOutAt   DateTime?
+  rebateCredit Float     @default(0.0)
+
+  resident ResidentProfile @relation(fields: [residentId], references: [id])
+
+  @@unique([residentId, date, mealType])
+}
+
+// -------------------------------------------------------------
+// 6. MAINTENANCE TICKETING
+// -------------------------------------------------------------
+model MaintenanceTicket {
+  id          String    @id @default(cuid())
+  residentId  String
+  staffId     String?
+  category    String    @default("PLUMBING") // PLUMBING, ELECTRICAL, CARPENTRY, WIFI_NETWORK, CLEANING, OTHER
+  priority    String    @default("MEDIUM") // LOW, MEDIUM, URGENT
+  status      String    @default("OPEN") // OPEN, ASSIGNED, IN_PROGRESS, RESOLVED, CLOSED
+  title       String
+  description String
+  photoUrl    String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  resolvedAt  DateTime?
+
+  resident ResidentProfile @relation(fields: [residentId], references: [id])
+  staff    StaffProfile?   @relation(fields: [staffId], references: [id])
+}
+
+// -------------------------------------------------------------
+// 7. GATE PASSES & DAMAGE REPORTS
+// -------------------------------------------------------------
+model GatePass {
+  id              String    @id @default(cuid())
+  residentId      String
+  approvedById    String?
+  reason          String
+  expectedOutTime DateTime
+  expectedInTime  DateTime
+  actualOutTime   DateTime?
+  actualInTime    DateTime?
+  status          String    @default("PENDING") // PENDING, APPROVED, REJECTED, CHECKED_OUT, RETURNED, OVERDUE
+  createdAt       DateTime  @default(now())
+
+  resident   ResidentProfile @relation(fields: [residentId], references: [id])
+  approvedBy StaffProfile?   @relation(fields: [approvedById], references: [id])
+}
+
+model DamageReport {
+  id             String   @id @default(cuid())
+  allocationId   String
+  itemDamaged    String
+  repairCost     Float    @default(0.0)
+  inspectionDate DateTime @default(now())
+  notes          String?
+
+  allocation Allocation @relation(fields: [allocationId], references: [id])
+}
+
